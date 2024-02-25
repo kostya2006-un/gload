@@ -1,2 +1,4 @@
 .idea
 /gload/oauth/migrations
+/gload/!*media/.gitkeep
+/gload/media/*
