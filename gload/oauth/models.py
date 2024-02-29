@@ -1,7 +1,10 @@
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .services import get_url_pat,validate_size_img
 
 
 class CustomUserManager(BaseUserManager):
@@ -46,6 +49,15 @@ class CustomUser(AbstractUser):
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
+    )
+    bio = models.TextField(_("bio"),blank=True,null=True,help_text="Расскажите о себе")
+
+    avatar = models.ImageField(
+        upload_to=get_url_pat,
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_size_img],
+        default='profilo.jpg'
     )
     objects = CustomUserManager()
 
