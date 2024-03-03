@@ -1,4 +1,5 @@
 .idea
 /gload/oauth/migrations
+/gload/music/migrations
 /gload/!*media/.gitkeep
 /gload/media/*

@@ -51,7 +51,7 @@ class AuthTests(APITestCase):
         response = self.client.post(url, {'uid': uid, 'token': token}, format='json')
         self.assertEqual(response.status_code, 204)
 
-    def login(self):
+    def test_login(self):
         self.register_user()
         self.activate()
         url = reverse('login')
