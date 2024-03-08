@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 from django.db import models
-
-from .services import validate_size_img, get_url_album_cover, get_url_track_cover,get_path_track
+from .services import validate_size_img, get_url_album_cover, get_url_track_cover, get_path_track, delete_old_cover
 
 User = get_user_model()
 
@@ -34,6 +33,13 @@ class Album(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Album.objects.get(pk=self.pk)
+            if self.cover != old_instance.cover:
+                delete_old_cover(old_instance.cover.path)
+        return super().save(*args, **kwargs)
+
 
 class Track(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='tracks')
@@ -58,8 +64,18 @@ class Track(models.Model):
     title = models.CharField(max_length=50)
     private = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Track.objects.get(pk=self.pk)
+            if self.cover != old_instance.cover:
+                delete_old_cover(old_instance.cover.path)
+            if self.file != old_instance.file:
+                delete_old_cover(old_instance.file.path)
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.user} - {self.title}'
+
 
 
 class Playlist(models.Model):

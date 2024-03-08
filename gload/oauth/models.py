@@ -1,4 +1,4 @@
-
+from .services import delete_old_cover
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
@@ -63,3 +63,10 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = CustomUser.objects.get(pk=self.pk)
+            if self.avatar != old_instance.avatar:
+                delete_old_cover(old_instance.avatar.path)
+        return super().save(*args, **kwargs)
