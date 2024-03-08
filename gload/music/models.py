@@ -56,6 +56,7 @@ class Track(models.Model):
         validators = [FileExtensionValidator(allowed_extensions=['mp3','wav'])],
     )
     title = models.CharField(max_length=50)
+    private = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user} - {self.title}'
