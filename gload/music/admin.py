@@ -2,13 +2,6 @@ from django.contrib import admin
 from . import models
 
 
-@admin.register(models.License)
-class LicenseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user')
-    list_display_links = ('user',)
-    list_filter = ('user',)
-
-
 @admin.register(models.Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')

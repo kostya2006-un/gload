@@ -6,12 +6,6 @@ from .services import validate_size_img, get_url_album_cover, get_url_track_cove
 User = get_user_model()
 
 
-class License(models.Model):
-    """Модель лицензий треков"""
-    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='license')
-    text = models.TextField(max_length=500)
-
-
 class Genre(models.Model):
     """Модель жанров трека"""
     name = models.CharField(max_length=50,unique=True)
@@ -37,13 +31,13 @@ class Album(models.Model):
         if self.pk:
             old_instance = Album.objects.get(pk=self.pk)
             if self.cover != old_instance.cover:
-                delete_old_cover(old_instance.cover.path)
+                if old_instance.cover:  # Проверяем, есть ли старый файл обложки
+                    delete_old_cover(old_instance.cover.path)
         return super().save(*args, **kwargs)
 
 
 class Track(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='tracks')
-    license = models.ForeignKey(License,on_delete=models.PROTECT)
     genres = models.ManyToManyField(Genre)
     album = models.ForeignKey(Album,on_delete=models.CASCADE,blank=True,null=True)
     likes = models.PositiveIntegerField(default=0)
@@ -75,7 +69,6 @@ class Track(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.title}'
-
 
 
 class Playlist(models.Model):

@@ -4,6 +4,7 @@ from .services import delete_old_cover
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name','bio', 'avatar','username','avatar']
