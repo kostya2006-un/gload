@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from .models import Genre
+from .models import Genre,Album
 User = get_user_model()
 
 
@@ -15,6 +15,9 @@ class MyApiTests(APITestCase):
         """База для Жанров"""
         Genre.objects.create(name='Rock')
         Genre.objects.create(name='Pop')
+        """База для альбомов"""
+        Album.objects.create(user = self.user, name = 'test_album1', description = 'des1')
+        Album.objects.create(user = self.user, name = 'test_album2', description = 'des2')
 
     def test_profile_api(self):
         url = reverse('profile_api')
@@ -40,3 +43,27 @@ class MyApiTests(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertIn({'name': 'Rock'}, response.data)
         self.assertIn({'name': 'Pop'}, response.data)
+
+    def test_public_albums_api(self):
+        url = reverse('albums_user')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        for album_data in response.data:
+            name = album_data['name']
+            description = album_data['description']
+            user = album_data['user']
+            cover = ''
+            private = album_data['private']
+            self.assertTrue(Album.objects.filter(name=name, description=description, user=user, cover=cover, private=private).exists())
+
+    def test_author_albums_api(self):
+        album_pk = 1
+        url = reverse('albums_author', kwargs={'pk': album_pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Album.objects.count(),len(response.data))
+        url2 = reverse('albums_author', kwargs={'pk':album_pk+1})
+        response2 = self.client.get(url2)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(0, len(response2.data))
+

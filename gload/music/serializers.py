@@ -16,10 +16,10 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ("name", "description", "user", "cover", "private")
 
     def update(self, instance, validated_data):
-        cover = instance.cover  # Получаем файл обложки
+        cover = instance.cover
         if cover:
             try:
-                delete_old_cover(cover.path)  # Удаляем старое изображение обложки
+                delete_old_cover(cover.path)
             except ValueError:
-                pass  # Если нет файла, ничего не делаем
+                pass
         return super().update(instance, validated_data)
