@@ -35,18 +35,18 @@ class Album(models.Model):
                     delete_old_cover(old_instance.cover.path)
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'{self.name} {self.user}'
+
 
 class Track(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='tracks')
     genres = models.ManyToManyField(Genre)
     album = models.ForeignKey(Album,on_delete=models.CASCADE,blank=True,null=True)
     likes = models.PositiveIntegerField(default=0)
-    listened = models.PositiveIntegerField(default=0)
-    dowload = models.PositiveIntegerField(default=0)
+    download = models.PositiveIntegerField(default=0)
     cover = models.ImageField(
         upload_to=get_url_track_cover,
-        blank=True,
-        null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_size_img],
     )
     created_at = models.DateTimeField(auto_now_add=True)

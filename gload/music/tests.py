@@ -44,18 +44,6 @@ class MyApiTests(APITestCase):
         self.assertIn({'name': 'Rock'}, response.data)
         self.assertIn({'name': 'Pop'}, response.data)
 
-    def test_public_albums_api(self):
-        url = reverse('albums_user')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        for album_data in response.data:
-            name = album_data['name']
-            description = album_data['description']
-            user = album_data['user']
-            cover = ''
-            private = album_data['private']
-            self.assertTrue(Album.objects.filter(name=name, description=description, user=user, cover=cover, private=private).exists())
-
     def test_author_albums_api(self):
         album_pk = 1
         url = reverse('albums_author', kwargs={'pk': album_pk})

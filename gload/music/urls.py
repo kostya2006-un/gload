@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import GenresApiViews,AlbumApiView,AlbumUserApi,AlbumAuthorApi
+from .views import TrackApiView
 
 urlpatterns = [
     path('genres/',GenresApiViews.as_view(),name = 'genres_api'),
@@ -9,4 +10,7 @@ urlpatterns = [
 
     path('albums_users',AlbumUserApi.as_view(),name = 'albums_user'),
     path('albums_author/<int:pk>/',AlbumAuthorApi.as_view(),name = 'albums_author'),
+
+    path('tracks/', TrackApiView.as_view({'get':'list','post':'create'})),
+    path('tracks/<int:pk>/', TrackApiView.as_view({'put':'update','delete':'destroy'})),
 ]
