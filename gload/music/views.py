@@ -41,14 +41,12 @@ class AlbumApiView(viewsets.ModelViewSet):
 class AlbumUserApi(generics.ListAPIView):
 
     serializer_class = AlbumSerializer
-    pagination_class = Pagination
     def get_queryset(self):
         return Album.objects.filter(private = False)
 
 
 class AlbumAuthorApi(generics.ListAPIView):
     serializer_class = AlbumSerializer
-    pagination_class = Pagination
 
     def get_queryset(self):
         return Album.objects.filter(user__id = self.kwargs.get('pk'), private = False)
