@@ -1,8 +1,12 @@
+from django.http import FileResponse, Http404
+from rest_framework.generics import get_object_or_404
+import os
 from .serializers import GenresSerializer,AlbumSerializer, TrackSerializer
-from rest_framework import generics, viewsets, parsers
+from rest_framework import generics, viewsets, parsers, views
 from .models import Genre, Album, Track
 from .permisions import IsAuthor
 from .services import delete_old_cover
+from .classes import Pagination
 
 
 class GenresApiViews(generics.ListAPIView):
@@ -37,13 +41,14 @@ class AlbumApiView(viewsets.ModelViewSet):
 class AlbumUserApi(generics.ListAPIView):
 
     serializer_class = AlbumSerializer
-
+    pagination_class = Pagination
     def get_queryset(self):
         return Album.objects.filter(private = False)
 
 
 class AlbumAuthorApi(generics.ListAPIView):
     serializer_class = AlbumSerializer
+    pagination_class = Pagination
 
     def get_queryset(self):
         return Album.objects.filter(user__id = self.kwargs.get('pk'), private = False)
@@ -79,6 +84,7 @@ class TrackApiView(viewsets.ModelViewSet):
 
 class TrackUserApi(generics.ListAPIView):
     serializer_class = TrackSerializer
+    pagination_class = Pagination
 
     def get_queryset(self):
         return Track.objects.filter(private = False)
@@ -86,6 +92,23 @@ class TrackUserApi(generics.ListAPIView):
 
 class TrackAuthorApi(generics.ListAPIView):
     serializer_class = TrackSerializer
+    pagination_class = Pagination
 
     def get_queryset(self):
         return Track.objects.filter(user__id = self.kwargs.get('pk'), private = False)
+
+
+class StreamingFileView(views.APIView):
+
+    def set_play(self,track):
+        track.listened += 1
+        track.save()
+
+    def get(self,request,pk):
+        track = get_object_or_404(Track, id = pk,private = False)
+        if os.path.exists(track.file.path):
+            self.set_play(track)
+            return FileResponse(open(track.file.path, "rb"), filename=track.file.name)
+        else:
+            return Http404
+

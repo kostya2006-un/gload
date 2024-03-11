@@ -45,6 +45,7 @@ class Track(models.Model):
     album = models.ForeignKey(Album,on_delete=models.CASCADE,blank=True,null=True)
     likes = models.PositiveIntegerField(default=0)
     download = models.PositiveIntegerField(default=0)
+    listened = models.PositiveIntegerField(default=0)
     cover = models.ImageField(
         upload_to=get_url_track_cover,
         validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_size_img],
