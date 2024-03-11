@@ -75,3 +75,17 @@ class TrackApiView(viewsets.ModelViewSet):
             except ValueError:
                 pass
         super().perform_destroy(instance)
+
+
+class TrackUserApi(generics.ListAPIView):
+    serializer_class = TrackSerializer
+
+    def get_queryset(self):
+        return Track.objects.filter(private = False)
+
+
+class TrackAuthorApi(generics.ListAPIView):
+    serializer_class = TrackSerializer
+
+    def get_queryset(self):
+        return Track.objects.filter(user__id = self.kwargs.get('pk'), private = False)
