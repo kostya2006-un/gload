@@ -75,6 +75,5 @@ class Track(models.Model):
 class Playlist(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='playlist')
     tracks = models.ManyToManyField(Track, related_name='user_fav_tracks')
-    albums = models.ManyToManyField(Album, related_name='user_fav_album')
     title = models.CharField(max_length=50)
 

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import BaseSerializer
 from .services import delete_old_cover
-from .models import Genre,Album,Track
+from .models import Genre,Album,Track,Playlist
 
 
 class GenresSerializer(serializers.ModelSerializer):
@@ -64,3 +64,11 @@ class TrackSerializer(serializers.ModelSerializer):
                 pass
 
         return super().update(instance, validated_data)
+
+
+class PlayListSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Playlist
+        fields = "__all__"

@@ -2,8 +2,9 @@ from django.http import FileResponse, Http404
 from rest_framework.generics import get_object_or_404
 import os
 from .serializers import GenresSerializer,AlbumSerializer, TrackSerializer
+from .serializers import PlayListSerializer
 from rest_framework import generics, viewsets, parsers, views
-from .models import Genre, Album, Track
+from .models import Genre, Album, Track, Playlist
 from .permisions import IsAuthor
 from .services import delete_old_cover
 from .classes import Pagination
@@ -126,3 +127,16 @@ class DownloadTrackView(views.APIView):
             return FileResponse(open(self.track.file.path, "rb"), filename=self.track.file.name, as_attachment=True)
         else:
             return Http404
+
+
+class PlayListApiView(viewsets.ModelViewSet):
+
+    parser_classes = (parsers.MultiPartParser,)
+    serializer_class = PlayListSerializer
+    permission_classes = [IsAuthor]
+
+    def get_queryset(self):
+        return Playlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
