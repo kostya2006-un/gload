@@ -36,7 +36,7 @@ class Album(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name} {self.user}'
+        return f'{self.name}'
 
 
 class Track(models.Model):

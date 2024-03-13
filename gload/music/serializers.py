@@ -32,6 +32,8 @@ class TrackSerializer(serializers.ModelSerializer):
     likes = serializers.IntegerField(read_only=True)
     download = serializers.IntegerField(read_only=True)
     user = serializers.CharField(read_only=True)
+    album = serializers.StringRelatedField()
+    genres = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Track

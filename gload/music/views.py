@@ -8,6 +8,7 @@ from .models import Genre, Album, Track, Playlist
 from .permisions import IsAuthor
 from .services import delete_old_cover
 from .classes import Pagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class GenresApiViews(generics.ListAPIView):
@@ -42,12 +43,18 @@ class AlbumApiView(viewsets.ModelViewSet):
 class AlbumUserApi(generics.ListAPIView):
 
     serializer_class = AlbumSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name',]
+
     def get_queryset(self):
         return Album.objects.filter(private = False)
 
 
 class AlbumAuthorApi(generics.ListAPIView):
     serializer_class = AlbumSerializer
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name', ]
 
     def get_queryset(self):
         return Album.objects.filter(user__id = self.kwargs.get('pk'), private = False)
@@ -84,6 +91,8 @@ class TrackApiView(viewsets.ModelViewSet):
 class TrackUserApi(generics.ListAPIView):
     serializer_class = TrackSerializer
     pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'genres__name','album__name']
 
     def get_queryset(self):
         return Track.objects.filter(private = False)
@@ -92,6 +101,8 @@ class TrackUserApi(generics.ListAPIView):
 class TrackAuthorApi(generics.ListAPIView):
     serializer_class = TrackSerializer
     pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'genres__name', 'album__name']
 
     def get_queryset(self):
         return Track.objects.filter(user__id = self.kwargs.get('pk'), private = False)
