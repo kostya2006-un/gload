@@ -1,4 +1,5 @@
 from django.http import FileResponse, Http404
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 import os
 from .serializers import GenresSerializer,AlbumSerializer, TrackSerializer
@@ -115,12 +116,22 @@ class StreamingFileView(views.APIView):
         track.save()
 
     def get(self,request,pk):
-        track = get_object_or_404(Track, id = pk,private = False)
-        if os.path.exists(track.file.path):
-            self.set_play(track)
-            return FileResponse(open(track.file.path, "rb"), filename=track.file.name)
+        track = get_object_or_404(Track, id = pk)
+        if track.private and track.user == request.user:
+            if os.path.exists(track.file.path):
+                self.set_play(track)
+                return FileResponse(open(track.file.path, "rb"), filename=track.file.name)
+            else:
+                return Http404
+        if not track.private:
+            if os.path.exists(track.file.path):
+                self.set_play(track)
+                return FileResponse(open(track.file.path, "rb"), filename=track.file.name)
+            else:
+                return Http404
         else:
-            return Http404
+            raise PermissionDenied("You don't have permission to listen this track.")
+
 
 
 class DownloadTrackView(views.APIView):
@@ -129,15 +140,23 @@ class DownloadTrackView(views.APIView):
         self.track.download += 1
         self.track.save()
 
-    def get(self,request,pk):
+    def get(self, request, pk):
+        self.track = get_object_or_404(Track, id=pk)
 
-        self.track = get_object_or_404(Track, id = pk, private = False)
-
-        if os.path.exists(self.track.file.path):
-            self.set_download()
-            return FileResponse(open(self.track.file.path, "rb"), filename=self.track.file.name, as_attachment=True)
+        if self.track.private and self.track.user == request.user:
+            if os.path.exists(self.track.file.path):
+                self.set_download()
+                return FileResponse(open(self.track.file.path, "rb"), filename=self.track.file.name, as_attachment=True)
+            else:
+                raise Http404
+        elif not self.track.private:
+            if os.path.exists(self.track.file.path):
+                self.set_download()
+                return FileResponse(open(self.track.file.path, "rb"), filename=self.track.file.name, as_attachment=True)
+            else:
+                raise Http404
         else:
-            return Http404
+            raise PermissionDenied("You don't have permission to download this track.")
 
 
 class PlayListApiView(viewsets.ModelViewSet):
